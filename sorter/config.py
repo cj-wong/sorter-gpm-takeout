@@ -42,7 +42,7 @@ try:
     with open('config.json', 'r') as f:
         CONFIG = json.load(f)
     FMT = CONFIG['format']
-    _TAKEOUT = Path(CONFIG['takeout_dir']) 
+    _TAKEOUT = Path(CONFIG['takeout_dir']).expanduser()
     TRACKS = _TAKEOUT / 'Google Play Music' / 'Tracks'
 except _CONFIG_LOAD_ERRORS as e:
     LOGGER.error('config.json doesn\'t exist or is malformed.')

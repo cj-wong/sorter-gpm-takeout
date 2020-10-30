@@ -1,3 +1,4 @@
 {
-    "format": "{n}{album}-{artist}-{track}.mp3"
+    "format": "{n}{album}-{artist}-{track}.mp3",
+    "takeout_dir": "/path/to/Takeout/"
 }

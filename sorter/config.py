@@ -44,6 +44,7 @@ try:
     FMT = CONFIG['format']
     _TAKEOUT = Path(CONFIG['takeout_dir']).expanduser()
     TRACKS = _TAKEOUT / 'Google Play Music' / 'Tracks'
+    DEST = Path(CONFIG['dest_dir']).expanduser()
 except _CONFIG_LOAD_ERRORS as e:
     LOGGER.error('config.json doesn\'t exist or is malformed.')
     LOGGER.error(f'More information: {e}')

@@ -8,3 +8,5 @@
 
 # Project-specific files
 config.json
+sorter-gpm.log
+sorter-gpm.log.[1-5]

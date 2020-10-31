@@ -1,5 +1,5 @@
 {
-    "format": "{n}{album}-{artist}-{track}.mp3",
+    "format": "{track_num} {album}-{artist}-{title}.mp3",
     "takeout_dir": "/path/to/Takeout/",
     "dest_dir": "/path/to/destionation"
 }

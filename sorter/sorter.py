@@ -7,6 +7,11 @@ import eyed3
 from sorter import config
 
 
+def sanitize(label: str) -> str:
+    """Replace parts of a string with sanitized versions."""
+    return label.replace('&amp;', '_').replace('&#39;s', '\'')
+
+
 class Sorter:
     """Sorter for GPM music.
 
@@ -206,8 +211,8 @@ class Sorter:
             bool: True if both track data match
 
         """
-        track_a_data = track_a_data.replace('&amp;', '_')
-        track_b_data = track_b_data.replace('&amp;', '_')
+        track_a_data = sanitize(track_a_data)
+        track_b_data = sanitize(track_b_data)
         return track_a_data == track_b_data
 
 

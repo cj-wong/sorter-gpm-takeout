@@ -150,8 +150,11 @@ class Sorter:
             Path: the renamed and moved track
 
         """
-        dest = album / config.FMT.format(**self.metadata[track])
-        track.rename(dest)
+        dest = (
+            album
+            / config.FMT.format(**self.metadata[track]).replace('/', '_')
+            )
+        track.replace(dest)
         return dest
 
     def link_track(self, album_track: Path, artist: Path) -> None:

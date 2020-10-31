@@ -76,6 +76,8 @@ class Sorter:
             Path: the directory created
 
         """
+        if element in config.CORR[category]:
+            element = config.CORR[category]
         if element.startswith('http://'):
             element = element.replace('http://', '')
         out_dir = config.DEST / f'{category}s' / element
@@ -93,17 +95,16 @@ class Sorter:
 
         """
         artist = self.row['Artist']
-        if artist in config.CORR['Artists']:
-            artist = config.CORR['Artists']
         if '&amp;' in artist:
             artist = artist.replace('&amp;', '_')
 
         # Before checking more new files, check whether the track
         # has already been seen in self.metadata.
         for track, metadata in self.metadata.items():
-            if (metadata['artist'] == artist
-                    and metadata['album'] == self.row['Album']
-                    and metadata['title'] == self.row['Title']):
+            if (self.fuzzy_match(metadata['artist'], artist)
+                    and self.fuzzy_match(metadata['album'], self.row['Album'])
+                    and self.fuzzy_match(
+                        metadata['title'], self.row['Title'])):
                 try:
                     self.track_data = eyed3.load(track)
                     return track

@@ -31,9 +31,10 @@ class Sorter:
                 if not track:
                     continue
 
-                self.extract_images()
                 album_dir = self.make_dirs('Album', self.row['Album'])
                 album_track = self.move_track(track, album_dir)
+
+                self.extract_images()
 
                 artist_dir = self.make_dirs('Artist', self.row['Artist'])
                 self.link_track(album_track, artist_dir)

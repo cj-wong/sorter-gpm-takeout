@@ -215,8 +215,15 @@ class Sorter:
             bool: True if both track data match
 
         """
-        track_a_data = sanitize(track_a_data)
-        track_b_data = sanitize(track_b_data)
+        if not track_a_data and not track_b_data:
+            return True
+        try:
+            track_a_data = sanitize(track_a_data)
+            track_b_data = sanitize(track_b_data)
+        except AttributeError:
+            # Because the case of being both has been handled earlier,
+            # both data cannot match if one is empty.
+            return False
         return track_a_data == track_b_data
 
 

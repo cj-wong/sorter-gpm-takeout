@@ -123,8 +123,11 @@ class Sorter:
                 'disc_max': disc_max,
                 }
 
-            if (self.track_data.tag.album == self.row['Album']
-                    and self.track_data.tag.title == self.row['Title']):
+            album = self.track_data.tag.album
+            title = self.track_data.tag.title
+
+            if (self.fuzzy_match(album, self.row['Album'])
+                    and self.fuzzy_match(title, self.row['Title'])):
                 return track
 
         # Nothing was found?
@@ -136,7 +139,6 @@ class Sorter:
             config.LOGGER.warning(
                 'The following track did not have any hits on artist.'
                 )
-            pass
 
         config.LOGGER.warning(
             'Could not find a matching track file given the following:'
@@ -191,6 +193,20 @@ class Sorter:
         """Delete files that have been successfully read."""
         for file in self.to_delete:
             file.unlink()
+
+    def fuzzy_match(track_a_data: str, track_b_data: str) -> bool:
+        """Check whether track_a_data and track_b_data fuzzy-match.
+
+        So far, it seems ampersands break comparisons. As a result,
+        ampersands will be ignored for comparison.
+
+        Returns:
+            bool: True if both track data match
+
+        """
+        track_a_data = track_a_data.replace('&amp;', '_')
+        track_b_data = track_b_data.replace('&amp;', '_')
+        return track_a_data == track_b_data
 
 
 class TrackCSV:

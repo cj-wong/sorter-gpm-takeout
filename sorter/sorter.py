@@ -194,7 +194,7 @@ class Sorter:
         for file in self.to_delete:
             file.unlink()
 
-    def fuzzy_match(track_a_data: str, track_b_data: str) -> bool:
+    def fuzzy_match(self, track_a_data: str, track_b_data: str) -> bool:
         """Check whether track_a_data and track_b_data fuzzy-match.
 
         So far, it seems ampersands break comparisons. As a result,

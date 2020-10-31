@@ -111,7 +111,13 @@ class Sorter:
                 return track
 
         # Nothing was found?
-        del self.track_data
+        # This can fail, if config.TRACKS.glob() couldn't find anything
+        # with the artist name.
+        try:
+            del self.track_data
+        except AttributeError:
+            pass
+
         config.LOGGER.warning(
             'Could not find a matching track file given the following:'
             )

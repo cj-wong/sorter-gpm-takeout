@@ -15,8 +15,12 @@ def sanitize(label: str, category: str) -> str:
     if label in config.CORR[category]:
         label = config.CORR[category]
 
-    return (label.replace('&amp;', '&').replace('&#39;', '\'')
-            .replace('&quot;', '"').replace('/', '_'))
+    try:
+        return (label.replace('&amp;', '&').replace('&#39;', '\'')
+                .replace('&quot;', '"').replace('/', '_'))
+    except AttributeError:
+        # I think only artists may be empty
+        return None
 
 
 class Sorter:
@@ -55,6 +59,9 @@ class Sorter:
             album_track = self.move_track(track, album_dir)
 
             self.extract_images(album_dir)
+
+            if not self.metadata['artist']:
+                continue
 
             artist_dir = self.make_dirs('Artist', self.metadata['artist'])
             self.link_track(album_track, artist_dir)

@@ -89,8 +89,13 @@ class Sorter:
             if (metadata['artist'] == artist
                     and metadata['album'] == self.row['Album']
                     and metadata['title'] == self.row['Title']):
-                self.track_data = eyed3.load(track)
-                return track
+                try:
+                    self.track_data = eyed3.load(track)
+                    return track
+                except OSError:
+                    # Somehow, this happens quite a bit often with files
+                    # that have duplicates (or near duplicates).
+                    continue
 
         # There is an exception to this pattern, and I'm unsure how
         # it'll be matched with its corresponding CSV.

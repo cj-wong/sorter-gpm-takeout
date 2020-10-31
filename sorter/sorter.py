@@ -151,7 +151,7 @@ class Sorter:
 
         """
         dest = album / config.FMT.format(**self.metadata[track])
-        track.replace(dest)
+        track.rename(dest)
         return dest
 
     def link_track(self, album_track: Path, artist: Path) -> None:

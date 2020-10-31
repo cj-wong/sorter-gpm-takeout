@@ -53,6 +53,7 @@ except _CONFIG_LOAD_ERRORS as e:
 try:
     with open('corrections.json', 'r') as f:
         CORR = json.load(f)
+    insert_empty_corrections()
 except _CONFIG_LOAD_ERRORS:
     LOGGER.info('corrections.json doesn\'t exist. Skipping.')
     CORR = {

@@ -76,8 +76,8 @@ class Sorter:
             Path: the directory created
 
         """
-        if element in config.CORR[category]:
-            element = config.CORR[category]
+        if element in config.CORR[f'{category}s']:
+            element = config.CORR[f'{category}s']
         if element.startswith('http://'):
             element = element.replace('http://', '')
         out_dir = config.DEST / f'{category}s' / element

@@ -68,8 +68,7 @@ class Sorter:
 
             # Check whether the track features multiple artists;
             # create the directories for each individual artist as well.
-            if ('Orchestra' in self.metadata['artist']
-                    and ',' in self.metadata['artist']):
+            if self.handle_orchestra():
                 pass
             else:
                 artists = self.metadata['artist'].split(', ')
@@ -142,3 +141,16 @@ class Sorter:
         except FileExistsError:
             config.LOGGER.warning(f'{dest} already exists as a symlink.')
             pass
+
+    def handle_orchestra(self) -> None:
+        """Handle orchestra, because why is conductor comma separated.
+
+        Not sure why this is such a trouble, but lots of the orchestral
+        music in my library have this problem.
+
+        """
+        return (',' in self.metadata['artist']
+                and ('Orchestra' in self.metadata['artist']
+                     or 'piano' in self.metadata['artist']
+                     or 'conductor' in self.metadata['artist'])
+                )

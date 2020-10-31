@@ -71,6 +71,8 @@ class Sorter:
             Path: the directory created
 
         """
+        if element.startswith('http://'):
+            element = element.replace('http://', '')
         out_dir = config.DEST / f'{category}s' / element
         out_dir.mkdir(parents=True, exist_ok=True)
         return out_dir

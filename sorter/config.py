@@ -49,3 +49,14 @@ except _CONFIG_LOAD_ERRORS as e:
     LOGGER.error('config.json doesn\'t exist or is malformed.')
     LOGGER.error(f'More information: {e}')
     raise e
+
+try:
+    with open('corrections.json', 'r') as f:
+        CORR = json.load(f)
+except _CONFIG_LOAD_ERRORS:
+    LOGGER.info('corrections.json doesn\'t exist. Skipping.')
+    CORR = {
+        'Artists': {},
+        'Albums': {},
+        'Titles': {},
+        }

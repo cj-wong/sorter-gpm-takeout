@@ -4,11 +4,9 @@
 
 Google Play Music files can be exported via Google [Takeout]. However, the resulting file structure in the archives is flattened (see [below](#file-structure) for details) from the original (notably, no Albums listed).
 
-In order to bring back structure, this project will read through the files and rebuild the albums list and possibly rename the files as desired. To do so, the CSVs in `Takeout/Google Play Music/Tracks` will be read for clues to piece the files together.
+In order to bring back structure, this project will read through the files and rebuild the albums list and possibly rename the files as desired. To do so, the MP3s in `Takeout/Google Play Music/Tracks` will be read for clues to piece the files together.
 
 **This project is not ever intended to modify metadata. It is strictly to organize the tracks into separate directories based on album and artist(s).**
-
-In hindsight, it may have made more sense to only read the MP3 files, since they already contain all the metadata. They also may have awkward titles, but with metadata, it's possible to rebuild the structure anyway. Maybe this will be a rewrite in the future - involving only the MP3s.
 
 ## File structure
 
@@ -44,19 +42,6 @@ Takeout/
         ├── Track1.mp3
         └── Track2.mp3
 ```
-
-Each subdirectory (`Playlists`, etc.) has its own kind of CSV structure. This project will concentrate on the subdirectory `Tracks` and the CSVs there.
-
-A track CSV may look like:
-
-```
-Title,Album,Artist,Duration (ms),Rating,Play Count,Removed
-"Track Title","Album Name","Artist Name","0","0","0",""
-```
-
-**It's important to note that although in the tree structure I list `Track1.csv` and a corresponding `Track1.mp3`, they will most likely never match.** The track file name generally is `Artist - Album - Title.mp3`, but sometimes the track title matches the file name. Other times, it's a mix of artist name, track name, and/or album name.
-
-Therefore, the CSV will get a general idea of the matching file, create the album directory if needed, read all files that may match for their ID3 tags, and move the right file to the album directory (and possibly rename, if desired).
 
 ## Format Structure
 

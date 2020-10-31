@@ -60,3 +60,14 @@ except _CONFIG_LOAD_ERRORS:
         'Albums': {},
         'Titles': {},
         }
+
+
+def insert_empty_corrections(field: str) -> None:
+    """Insert empty dictionaries into corrections if not present.
+
+    Args:
+        field (str): 'Artist', 'Album', 'Title'
+
+    """
+    if field not in CORR:
+        CORR[field] = {}

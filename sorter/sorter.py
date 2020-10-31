@@ -1,5 +1,4 @@
 from pathlib import Path
-from typing import Dict, List, Union
 
 import eyed3
 
@@ -13,8 +12,8 @@ def sanitize(label: str, category: str) -> str:
     is the slash '/', since slashes are part of paths.
 
     """
-    if label in config.CONN[category]:
-        label = config.CONN[category]
+    if label in config.CORR[category]:
+        label = config.CORR[category]
 
     return (label.replace('&amp;', '&').replace('&#39;', '\'')
             .replace('&quot;', '"').replace('/', '_'))

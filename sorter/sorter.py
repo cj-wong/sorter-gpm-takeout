@@ -117,6 +117,9 @@ class Sorter:
             # Don't read metadata from already read tracks
             if track in self.metadata:
                 continue
+
+            config.LOGGER.info(f'Globbed: {track}')
+
             self.track_data = eyed3.load(track)
             track_min, track_max = self.track_data.tag.track_num
             disc_min, disc_max = self.track_data.tag.disc_num

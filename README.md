@@ -8,6 +8,8 @@ In order to bring back structure, this project will read through the files and r
 
 **This project is not ever intended to modify metadata. It is strictly to organize the tracks into separate directories based on album and artist(s).**
 
+In hindsight, it may have made more sense to only read the MP3 files, since they already contain all the metadata. They also may have awkward titles, but with metadata, it's possible to rebuild the structure anyway. Maybe this will be a rewrite in the future - involving only the MP3s.
+
 ## File structure
 
 When you extract the files from the archives, you will end up with a file structure like this:

@@ -17,7 +17,7 @@ def sanitize(label: str, category: str) -> str:
 
     try:
         return (label.replace('&amp;', '&').replace('&#39;', '\'')
-                .replace('&quot;', '"').replace('/', '_'))
+                .replace('&quot;', '"').replace('/', '_').replace(';', ','))
     except AttributeError:
         # I think only artists may be empty
         return None
@@ -68,7 +68,7 @@ class Sorter:
 
             # Check whether the track features multiple artists;
             # create the directories for each individual artist as well.
-            if self.handle_orchestra():
+            if self.handle_orchestra() or self.handle_suffix():
                 pass
             else:
                 artists = self.metadata['artist'].split(', ')
@@ -151,6 +151,23 @@ class Sorter:
         """
         return (',' in self.metadata['artist']
                 and ('Orchestra' in self.metadata['artist']
+                     or 'cello' in self.metadata['artist']
+                     or 'conductor' in self.metadata['artist']
+                     or 'Conductor' in self.metadata['artist']
+                     or 'composer' in self.metadata['artist']
+                     or 'Composter' in self.metadata['artist'] # FFS
+                     or 'harpsichord' in self.metadata['artist']
+                     or 'flute' in self.metadata['artist']
                      or 'piano' in self.metadata['artist']
-                     or 'conductor' in self.metadata['artist'])
+                     or 'Soloist' in self.metadata['artist']
+                     or 'violin' in self.metadata['artist'])
                 )
+
+    def handle_suffix(self) -> None:
+        """Handle suffixes, e.g. Someone, Jr.
+
+        This may be a fragile function, because a Jr. might be in the list
+        of multiple artists.
+
+        """
+        return ', Jr.' in self.metadata['artist']

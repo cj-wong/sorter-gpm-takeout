@@ -9,7 +9,7 @@ from sorter import config
 
 def sanitize(label: str) -> str:
     """Replace parts of a string with sanitized versions."""
-    return label.replace('&amp;', '_').replace('&#39;s', '\'')
+    return label.replace('&amp;', '_').replace('&#39;', '\'')
 
 
 class Sorter:
@@ -108,9 +108,11 @@ class Sorter:
                 try:
                     self.track_data = eyed3.load(track)
                     return track
-                except OSError:
+                except OSError as e:
                     # Somehow, this happens quite a bit often with files
                     # that have duplicates (or near duplicates).
+                    config.LOGGER.info('You may have had a duplicate.')
+                    config.LOGGER.info(f'More info: {e}')
                     continue
 
         # There is an exception to this pattern, and I'm unsure how

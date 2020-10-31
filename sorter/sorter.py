@@ -43,8 +43,8 @@ class Sorter:
             disc_min, disc_max = self.track_data.tag.disc_num
             self.metadata = {
                 'artist': sanitize(self.track_data.tag.artist, 'Artist'),
-                'album': sanitize(self.track_data.tag.album, ''),
-                'title': sanitize(self.track_data.tag.title),
+                'album': sanitize(self.track_data.tag.album, 'Album'),
+                'title': sanitize(self.track_data.tag.title, 'Title'),
                 'track_num': track_min,
                 'track_max': track_max,
                 'disc_num': disc_min,

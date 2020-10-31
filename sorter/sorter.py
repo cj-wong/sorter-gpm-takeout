@@ -82,6 +82,8 @@ class Sorter:
 
         """
         artist = self.row['Artist']
+        if '&amp;' in artist:
+            artist = artist.replace('&amp;', '_')
 
         # Before checking more new files, check whether the track
         # has already been seen in self.metadata.

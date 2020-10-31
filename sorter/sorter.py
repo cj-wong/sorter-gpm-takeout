@@ -44,11 +44,15 @@ class Sorter:
 
                 # Check whether the track features multiple artists;
                 # create the directories for each individual artist as well.
-                artists = self.row['Artist'].split(', ')
-                if len(artists) > 1:
-                    for artist in artists:
-                        artist_dir = self.make_dirs('Artist', artist)
-                        self.link_track(album_track, artist_dir)
+                if ('Orchestra' in self.row['Artist']
+                        and ',' in self.row['Artist']):
+                    pass
+                else:
+                    artists = self.row['Artist'].split(', ')
+                    if len(artists) > 1:
+                        for artist in artists:
+                            artist_dir = self.make_dirs('Artist', artist)
+                            self.link_track(album_track, artist_dir)
                 delete_ok = True
             if delete_ok:
                 self.to_delete.append(file)

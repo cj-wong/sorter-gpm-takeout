@@ -6,6 +6,8 @@ Google Play Music files can be exported via Google [Takeout]. However, the resul
 
 In order to bring back structure, this project will read through the files and rebuild the albums list and possibly rename the files as desired. To do so, the CSVs in `Takeout/Google Play Music/Tracks` will be read for clues to piece the files together.
 
+**This project is not ever intended to modify metadata. It is strictly to organize the tracks into separate directories based on album and artist(s).**
+
 ## File structure
 
 When you extract the files from the archives, you will end up with a file structure like this:

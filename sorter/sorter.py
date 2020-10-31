@@ -116,7 +116,7 @@ class Sorter:
         """
         dest = (
             album
-            / config.FMT.format(**self.metadata[track])
+            / config.FMT.format(**self.metadata)
             )
         track.replace(dest)
         return dest

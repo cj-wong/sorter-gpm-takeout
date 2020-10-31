@@ -80,6 +80,7 @@ class Sorter:
             element = config.CORR[f'{category}s']
         if element.startswith('http://'):
             element = element.replace('http://', '')
+        element = sanitize(element)
         out_dir = config.DEST / f'{category}s' / element
         out_dir.mkdir(parents=True, exist_ok=True)
         return out_dir

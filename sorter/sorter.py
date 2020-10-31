@@ -42,7 +42,7 @@ class Sorter:
                 album_dir = self.make_dirs('Album', self.row['Album'])
                 album_track = self.move_track(track, album_dir)
 
-                self.extract_images()
+                self.extract_images(album_dir)
 
                 artist_dir = self.make_dirs('Artist', self.row['Artist'])
                 self.link_track(album_track, artist_dir)
@@ -160,11 +160,15 @@ class Sorter:
         one_line = f'{self.row["Album"]}-{self.row["Title"]}-{artist}'
         config.LOGGER.warning(one_line)
 
-    def extract_images(self) -> None:
-        """Extract album images from the track."""
-        album = self.track_data.tag.album
+    def extract_images(self, album: Path) -> None:
+        """Extract album images from the track.
+
+        Args:
+            album (Path): the file and path of the album
+
+        """
         for image in self.track_data.tag.images:
-            img_file = config.DEST / 'Albums' / album / image.makeFileName()
+            img_file = album / image.makeFileName()
             if img_file.exists():
                 continue
             with img_file.open(mode='wb') as img:

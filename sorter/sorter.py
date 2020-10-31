@@ -9,7 +9,8 @@ from sorter import config
 
 def sanitize(label: str) -> str:
     """Replace parts of a string with sanitized versions."""
-    return label.replace('&amp;', '_').replace('&#39;', '\'')
+    return (label.replace('&amp;', '_').replace('&#39;', '\'')
+            .replace('&quot;', '"'))
 
 
 class Sorter:

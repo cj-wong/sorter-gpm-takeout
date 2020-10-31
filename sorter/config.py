@@ -38,15 +38,16 @@ _CONFIG_LOAD_ERRORS = (
     )
 
 
-def insert_empty_corrections(field: str) -> None:
-    """Insert empty dictionaries into corrections if not present.
+_FIELDS = ('Artist', 'Album', 'Title')
 
-    Args:
-        field (str): 'Artist', 'Album', 'Title'
+CORR = {}
 
-    """
-    if field not in CORR:
-        CORR[field] = {}
+
+def insert_missing_corrections() -> None:
+    """Insert empty dictionaries into corrections if not present."""
+    for field in _FIELDS:
+        if field not in CORR:
+            CORR[field] = {}
 
 
 try:
@@ -64,11 +65,7 @@ except _CONFIG_LOAD_ERRORS as e:
 try:
     with open('corrections.json', 'r') as f:
         CORR = json.load(f)
-    insert_empty_corrections()
+    insert_missing_corrections()
 except _CONFIG_LOAD_ERRORS:
     LOGGER.info('corrections.json doesn\'t exist. Skipping.')
-    CORR = {
-        'Artists': {},
-        'Albums': {},
-        'Titles': {},
-        }
+    insert_missing_corrections()

@@ -26,6 +26,7 @@ class Sorter:
     def sort(self) -> None:
         """Open all CSVs and get the corresponding track."""
         for file in config.TRACKS.glob('*.csv'):
+            config.LOGGER.info(f'Now checking {file}')
             delete_ok = False
             # Title,Album,Artist,Duration (ms),Rating,Play Count,Removed
             for self.row in TrackCSV(file).read():
@@ -121,6 +122,9 @@ class Sorter:
         try:
             del self.track_data
         except AttributeError:
+            config.LOGGER.warning(
+                'The following track did not have any hits on artist.'
+                )
             pass
 
         config.LOGGER.warning(
@@ -166,7 +170,11 @@ class Sorter:
 
         """
         dest = artist / album_track.name
-        dest.symlink_to(album_track)
+        try:
+            dest.symlink_to(album_track)
+        except FileExistsError:
+            config.LOGGER.warning(f'{dest} already exists as a symlink.')
+            pass
 
     def delete_csv(self) -> None:
         """Delete files that have been successfully read."""

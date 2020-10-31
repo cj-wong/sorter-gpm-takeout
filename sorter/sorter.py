@@ -32,18 +32,19 @@ class Sorter:
                     continue
 
                 self.extract_images()
-                album = self.make_dirs('Album', self.row['Album'])
-                self.move_track(track, album)
+                album_dir = self.make_dirs('Album', self.row['Album'])
+                album_track = self.move_track(track, album_dir)
 
-                self.make_dirs('Artist', self.row['Artist'])
-                self.link_track(track, album)
+                artist_dir = self.make_dirs('Artist', self.row['Artist'])
+                self.link_track(album_track, artist_dir)
 
                 # Check whether the track features multiple artists;
                 # create the directories for each individual artist as well.
                 artists = self.row['Artist'].split(', ')
                 if len(artists) > 1:
                     for artist in artists:
-                        self.make_dirs('Artist', artist)
+                        artist_dir = self.make_dirs('Artist', artist)
+                        self.link_track(album_track, artist_dir)
 
     def make_dirs(self, category: str, element: str) -> Path:
         """Make a directory given category and element.
@@ -126,29 +127,31 @@ class Sorter:
             with img_file.open(mode='wb') as img:
                 img.write(image.image_data)
 
-    def move_track(self, track: Path, album: Path) -> None:
+    def move_track(self, track: Path, album: Path) -> Path:
         """Move a track from the Takeout folder into its album.
 
         Args:
             track (Path): the file and path of the track
             album (Path): the album directory
 
-        """
-        dest = album / track.name
-        track.replace(dest)
+        Returns:
+            Path: the renamed and moved track
 
-    def link_track(self, track: Path, album: Path, artist: Path) -> None:
+        """
+        dest = album / config.FMT.format(**self.metadata[track])
+        track.replace(dest)
+        return dest
+
+    def link_track(self, album_track: Path, artist: Path) -> None:
         """Link a track from its album to artists' directories.
 
         Args:
             track (Path): the file and path of the track
-            album (Path): the album directory
             artist (Path): the artist directory
 
         """
-        src = album / track.name
-        dest = artist / track.name
-        dest.symlink_to(src)
+        dest = artist / album_track.name
+        dest.symlink_to(album_track)
 
 
 class TrackCSV:

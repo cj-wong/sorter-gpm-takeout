@@ -21,10 +21,12 @@ class Sorter:
     def __init__(self) -> None:
         """Initialize metadata, so that music files will only be read once."""
         self.metadata = {}
+        self.to_delete = []
 
     def sort(self) -> None:
         """Open all CSVs and get the corresponding track."""
         for file in config.TRACKS.glob('*.csv'):
+            delete_ok = False
             # Title,Album,Artist,Duration (ms),Rating,Play Count,Removed
             for self.row in TrackCSV(file).read():
                 track = self.find_track()
@@ -46,6 +48,9 @@ class Sorter:
                     for artist in artists:
                         artist_dir = self.make_dirs('Artist', artist)
                         self.link_track(album_track, artist_dir)
+                delete_ok = True
+            if delete_ok:
+                self.to_delete.append(file)
 
     def make_dirs(self, category: str, element: str) -> Path:
         """Make a directory given category and element.
@@ -159,6 +164,11 @@ class Sorter:
         """
         dest = artist / album_track.name
         dest.symlink_to(album_track)
+
+    def delete_csv(self) -> None:
+        """Delete files that have been successfully read."""
+        for file in self.to_delete:
+            file.unlink()
 
 
 class TrackCSV:

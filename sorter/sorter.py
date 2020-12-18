@@ -1,8 +1,12 @@
+import re
 from pathlib import Path
 
 import eyed3
 
 from sorter import config
+
+
+SUFFIX = re.compile(r'[,_] ([js]r)', re.IGNORECASE)
 
 
 def sanitize(label: str, category: str) -> str:
@@ -75,14 +79,21 @@ class Sorter:
                 artist_dir = self.make_dirs('Artist', self.metadata['artist'])
                 self.link_track(album_track, artist_dir)
 
-            # Check whether the track features multiple artists;
-            # create the directories for each individual artist as well.
-            if self.handle_orchestra() or self.handle_suffix():
+            self.metadata['artist'] = self.substitute_suffixes(
+                self.metadata['artist'], '_')
+
+            # Orchestra music can't be put into separate artists' directories
+            # due to metadata mangling. e.g. Person A, composer, Person B
+            # Unfortunately, due to string splitting to commas, "composer"
+            # would be interpreted as a valid artist.
+            if self.handle_orchestra():
                 pass
             else:
                 artists = self.metadata['artist'].split(', ')
                 if len(artists) > 1:
                     for artist in artists:
+                        # Replace potential swap from substitute_suffixes().
+                        artist = self.substitute_suffixes(artist, ',')
                         artist_dir = self.make_dirs('Artist', artist)
                         self.link_track(album_track, artist_dir)
 
@@ -171,11 +182,17 @@ class Sorter:
                      or 'violin' in self.metadata['artist'])
                 )
 
-    def handle_suffix(self) -> None:
-        """Handle suffixes, e.g. Someone, Jr.
+    def substitute_suffixes(self, artist: str, separator: str) -> str:
+        """Substitute suffixes, e.g. Someone, Jr. turns into Someone_ Jr.
 
-        This may be a fragile function, because a Jr. might be in the list
-        of multiple artists.
+        The artist(s) name can also be converted back as necessary.
+
+        Args:
+            artist (str): artist metadata
+            separator (str): either comma or underscore
+
+        Returns:
+            str: the metadata with suffixes transformed
 
         """
-        return ', Jr.' in self.metadata['artist']
+        return SUFFIX.sub(rf'{separator} \1', artist)

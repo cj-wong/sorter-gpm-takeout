@@ -2,9 +2,11 @@
 
 ## Overview
 
-Google Play Music files can be exported via Google [Takeout]. However, the resulting file structure in the archives is flattened (see [below](#file-structure) for details) from the original (notably, no Albums listed).
+Google Play Music files can be exported via Google [Takeout]. However, the resulting file structure in the archives is flattened (see [below](#file-structure) for details) from the original (notably, no Albums listed) *and* many, if not most, of the files have truncated names.
 
 In order to bring back structure, this project will read through the files and rebuild the albums list and possibly rename the files as desired. To do so, the MP3s in `Takeout/Google Play Music/Tracks` will be read for clues to piece the files together.
+
+Furthermore, a [pattern](#format-structure) may be supplied in the configuration to rename files in a way that better convey a track's metadata.
 
 **This project is not ever intended to modify metadata. It is strictly to organize the tracks into separate directories based on album and artist(s).**
 
@@ -59,7 +61,7 @@ The following fields are available:
 
 To use these fields, simply insert the field name anywhere you prefer and surround the field with curly braces, like so: `{artist}`.
 
-`*` Unfortunately, these fields can be missing/stripped from Takeout. I'm unsure what the mechanic is for the deletion of this data, but both disc numbers and both track numbers can be 0.
+`*` Unfortunately, these fields can be missing/stripped from Takeout. Disc numbers will be updated to the default of 1 if missing, but track numbers can't be changed. In both cases, you will be alerted of the missing numbers and can take action later. Make sure to check the logs for `has missing` to pin-down the troublesome files.
 
 ## Usage
 
@@ -89,7 +91,7 @@ This code is designed around the following:
 - `"Album"`
 - `"Title"`
 
-⚠ **These corrections do not take in account any other context, only their associated field.**
+⚠ **These corrections do not take in account any other context, only their associated field. This means that when a value matches, it will be unconditionally substituted with its replacement.**
 
 If any of the fields are missing, they will be substituted with an empty dictionary within [config.py](sorter/config.py).
 

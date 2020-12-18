@@ -49,7 +49,16 @@ class Sorter:
             has_album = True
             self.track_data = eyed3.load(track)
             track_min, track_max = self.track_data.tag.track_num
+            if track_min == 0 or track_max == 0:
+                config.LOGGER.warning(f'{track} has missing track number(s)!')
             disc_min, disc_max = self.track_data.tag.disc_num
+            if disc_min == 0:
+                config.LOGGER.warning(f'{track} has missing disc number!')
+                disc_min = 1
+            if disc_max == 0:
+                config.LOGGER.warning(
+                    f'{track} has missing total disc number per album!')
+                disc_max = 1
             self.metadata = {
                 'artist': sanitize(self.track_data.tag.artist, 'Artist'),
                 'album': sanitize(self.track_data.tag.album, 'Album'),

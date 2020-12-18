@@ -42,6 +42,7 @@ class Sorter:
         """Sort all MP3s given their ID3 metadata."""
         for track in config.TRACKS.glob('*.mp3'):
             config.LOGGER.info(f'Now checking {track}')
+            has_album = True
             self.track_data = eyed3.load(track)
             track_min, track_max = self.track_data.tag.track_num
             disc_min, disc_max = self.track_data.tag.disc_num
@@ -55,16 +56,24 @@ class Sorter:
                 'disc_max': disc_max,
                 }
 
-            album_dir = self.make_dirs('Album', self.metadata['album'])
-            album_track = self.move_track(track, album_dir)
+            try:
+                album_dir = self.make_dirs('Album', self.metadata['album'])
+            except KeyError:
+                # This isn't an album track, but when no album is present,
+                # the group artists are used instead while retaining
+                # the original variable name.
+                album_dir = self.make_dirs('Artist', self.metadata['artist'])
+                has_album = False
 
+            album_track = self.move_track(track, album_dir)
             self.extract_images(album_dir)
 
             if not self.metadata['artist']:
                 continue
 
-            artist_dir = self.make_dirs('Artist', self.metadata['artist'])
-            self.link_track(album_track, artist_dir)
+            if has_album:
+                artist_dir = self.make_dirs('Artist', self.metadata['artist'])
+                self.link_track(album_track, artist_dir)
 
             # Check whether the track features multiple artists;
             # create the directories for each individual artist as well.
@@ -140,7 +149,6 @@ class Sorter:
             dest.symlink_to(album_track)
         except FileExistsError:
             config.LOGGER.warning(f'{dest} already exists as a symlink.')
-            pass
 
     def handle_orchestra(self) -> None:
         """Handle orchestra, because why is conductor comma separated.

@@ -2,6 +2,7 @@ import json
 import logging
 import logging.handlers
 from pathlib import Path
+from typing import Dict, Union
 
 
 _LOGGER_NAME = 'sorter-gpm'
@@ -40,7 +41,7 @@ _CONFIG_LOAD_ERRORS = (
 
 _FIELDS = ('Artist', 'Album', 'Title')
 
-CORR = {}
+CORR: Dict[str, Union[Dict[str, str], Dict]] = {}
 
 
 def insert_missing_corrections() -> None:

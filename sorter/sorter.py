@@ -17,7 +17,7 @@ def sanitize(label: str, category: str) -> str:
 
     """
     if label in config.CORR[category]:
-        label = config.CORR[category]
+        label = config.CORR[category][label]
 
     try:
         return (label.replace('&amp;', '&').replace('&#39;', '\'')

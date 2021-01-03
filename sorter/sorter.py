@@ -15,6 +15,9 @@ def sanitize(label: str, category: str) -> str:
     The only character that cannot match its intended character
     is the slash '/', since slashes are part of paths.
 
+    Returns:
+        str: the label, sanitized; or if it couldn't be sanitized, itself
+
     """
     if label in config.CORR[category]:
         label = config.CORR[category][label]
@@ -23,8 +26,10 @@ def sanitize(label: str, category: str) -> str:
         return (label.replace('&amp;', '&').replace('&#39;', '\'')
                 .replace('&quot;', '"').replace('/', '_').replace(';', ','))
     except AttributeError:
-        # I think only artists may be empty
-        return None
+        # I believe only the artists tag may be empty.
+        # Albums might also be empty. In any case, empty tags cannot be
+        # sanitized any further.
+        return label
 
 
 class Sorter:
@@ -95,7 +100,9 @@ class Sorter:
             # due to metadata mangling. e.g. Person A, composer, Person B
             # Unfortunately, due to string splitting to commas, "composer"
             # would be interpreted as a valid artist.
-            if self.handle_orchestra():
+            # I suppose in the future, I can resolve this by substituting
+            # commas with underscores, just like with suffixes.
+            if self.is_artist_orchestra():
                 pass
             else:
                 artists = self.metadata['artist'].split(', ')
@@ -170,26 +177,33 @@ class Sorter:
         except FileExistsError:
             config.LOGGER.warning(f'{dest} already exists as a symlink.')
 
-    def handle_orchestra(self) -> None:
-        """Handle orchestra, because why is conductor comma separated.
+    def is_artist_orchestra(self) -> bool:
+        """Check whether the artist is orchestra related.
+
+        Bcause why is "conductor" or an instrument comma separated from
+        the individual artist?
 
         Not sure why this is such a trouble, but lots of the orchestral
         music in my library have this problem.
 
+        Returns:
+            bool: True if the artist appears to be an orchestra;
+                False otherwise
+
         """
-        return (',' in self.metadata['artist']
-                and ('Orchestra' in self.metadata['artist']
-                     or 'cello' in self.metadata['artist']
-                     or 'conductor' in self.metadata['artist']
-                     or 'Conductor' in self.metadata['artist']
-                     or 'composer' in self.metadata['artist']
-                     or 'Composter' in self.metadata['artist'] # FFS
-                     or 'harpsichord' in self.metadata['artist']
-                     or 'flute' in self.metadata['artist']
-                     or 'piano' in self.metadata['artist']
-                     or 'Soloist' in self.metadata['artist']
-                     or 'violin' in self.metadata['artist'])
-                )
+        artist = self.metadata['artist']
+        return (',' in artist
+                and ('Orchestra' in artist
+                     or 'cello' in artist
+                     or 'conductor' in artist
+                     or 'Conductor' in artist
+                     or 'composer' in artist
+                     or 'Composter' in artist # FFS
+                     or 'harpsichord' in artist
+                     or 'flute' in artist
+                     or 'piano' in artist
+                     or 'Soloist' in artist
+                     or 'violin' in artist))
 
     def substitute_suffixes(self, artist: str, separator: str) -> str:
         """Substitute suffixes, e.g. Someone, Jr. turns into Someone_ Jr.

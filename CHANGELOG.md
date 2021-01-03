@@ -3,6 +3,15 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## [0.2.2] - 2021-01-02
+### Changed
+- The project has now been linted additionally by `mypy` on top of `Flake8`.
+
+### Fixed
+- In [sorter.py]:
+    - In `sanitize()`, `label` was being incorrectly assigned `config.CORR[category]`, when in fact `config.CORR[category][label]` is the desired element.
+    - `Sorter.handle_orchestra()` is now `Sorter.is_artist_orchestra()` and correctly returns a `bool` as per typing.
+
 ## [0.2.1] - 2020-12-17
 ### Fixed
 - Issue #1:
@@ -19,3 +28,5 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ## [0.1.0] - 2020-10-31
 ### Added
 - Initial version
+
+[sorter.py]: sorter/sorter.py

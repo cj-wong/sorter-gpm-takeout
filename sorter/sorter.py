@@ -1,5 +1,6 @@
 import re
 from pathlib import Path
+from typing import Optional
 
 import eyed3
 
@@ -9,16 +10,25 @@ from sorter import config
 SUFFIX = re.compile(r'[,_] ([js]r)', re.IGNORECASE)
 
 
-def sanitize(label: str, category: str) -> str:
+def sanitize(category: str, label: Optional[str]) -> Optional[str]:
     """Replace parts of a string with sanitized versions.
 
     The only character that cannot match its intended character
     is the slash '/', since slashes are part of paths.
 
+    Args:
+        category (str): 'Album', 'Artist', or 'Title'
+        label (Optional[str]): either an album, an artist, or a title;
+            this value may be None if not present on the MP3 tag
+
     Returns:
-        str: the label, sanitized; or if it couldn't be sanitized, itself
+        str: the label, sanitized
+        None: the original label was None
 
     """
+    if label is None:
+        return None
+
     if label in config.CORR[category]:
         label = config.CORR[category][label]
 
@@ -29,7 +39,7 @@ def sanitize(label: str, category: str) -> str:
         # I believe only the artists tag may be empty.
         # Albums might also be empty. In any case, empty tags cannot be
         # sanitized any further.
-        return label
+        return None
 
 
 class Sorter:
@@ -65,9 +75,9 @@ class Sorter:
                     f'{track} has missing total disc number per album!')
                 disc_max = 1
             self.metadata = {
-                'artist': sanitize(self.track_data.tag.artist, 'Artist'),
-                'album': sanitize(self.track_data.tag.album, 'Album'),
-                'title': sanitize(self.track_data.tag.title, 'Title'),
+                'artist': sanitize('Artist', self.track_data.tag.artist),
+                'album': sanitize('Album', self.track_data.tag.album),
+                'title': sanitize('Title', self.track_data.tag.title),
                 'track_num': track_min,
                 'track_max': track_max,
                 'disc_num': disc_min,
@@ -76,12 +86,23 @@ class Sorter:
 
             try:
                 album_dir = self.make_dirs('Album', self.metadata['album'])
-            except KeyError:
-                # This isn't an album track, but when no album is present,
-                # the group artists are used instead while retaining
-                # the original variable name.
-                album_dir = self.make_dirs('Artist', self.metadata['artist'])
-                has_album = False
+            except (KeyError, ValueError):
+                try:
+                    # This isn't an album track, but when no album is present,
+                    # the group artists are used instead while retaining
+                    # the original variable name.
+                    album_dir = self.make_dirs(
+                        'Artist', self.metadata['artist']
+                        )
+                    has_album = False
+                except ValueError:
+                    config.LOGGER.warning(
+                        'Could not find album or artist info for:'
+                        )
+                    config.LOGGER.warning(
+                        f'{self.metadata["title"]}'
+                        )
+                    continue
 
             album_track = self.move_track(track, album_dir)
             self.extract_images(album_dir)
@@ -93,8 +114,12 @@ class Sorter:
                 artist_dir = self.make_dirs('Artist', self.metadata['artist'])
                 self.link_track(album_track, artist_dir)
 
-            self.metadata['artist'] = self.substitute_suffixes(
-                self.metadata['artist'], '_')
+            artist = self.metadata['artist']
+
+            if not artist:
+                continue
+
+            artist = self.substitute_suffixes(artist, '_')
 
             # Orchestra music can't be put into separate artists' directories
             # due to metadata mangling. e.g. Person A, composer, Person B
@@ -102,10 +127,10 @@ class Sorter:
             # would be interpreted as a valid artist.
             # I suppose in the future, I can resolve this by substituting
             # commas with underscores, just like with suffixes.
-            if self.is_artist_orchestra():
+            if self.is_artist_orchestra(artist):
                 pass
             else:
-                artists = self.metadata['artist'].split(', ')
+                artists = artist.split(', ')
                 if len(artists) > 1:
                     for artist in artists:
                         # Replace potential swap from substitute_suffixes().
@@ -113,7 +138,7 @@ class Sorter:
                         artist_dir = self.make_dirs('Artist', artist)
                         self.link_track(album_track, artist_dir)
 
-    def make_dirs(self, category: str, element: str) -> Path:
+    def make_dirs(self, category: str, element: Optional[str]) -> Path:
         """Make a directory given category and element.
 
         Because `Path.mkdir` is supplied the arguments `parents` and
@@ -121,12 +146,17 @@ class Sorter:
 
         Args:
             category (str): 'Album' or 'Artist'
-            element (str): e.g. an artist or an album
+            element (Optional[str]): e.g. an artist or an album
 
         Returns:
             Path: the directory created
 
+        Raises:
+            ValueError: element is blank or None
+
         """
+        if not element:
+            raise ValueError('element is blank')
         out_dir = config.DEST / f'{category}s' / element
         out_dir.mkdir(parents=True, exist_ok=True)
         return out_dir
@@ -177,7 +207,7 @@ class Sorter:
         except FileExistsError:
             config.LOGGER.warning(f'{dest} already exists as a symlink.')
 
-    def is_artist_orchestra(self) -> bool:
+    def is_artist_orchestra(self, artist: str) -> bool:
         """Check whether the artist is orchestra related.
 
         Bcause why is "conductor" or an instrument comma separated from
@@ -186,12 +216,14 @@ class Sorter:
         Not sure why this is such a trouble, but lots of the orchestral
         music in my library have this problem.
 
+        Args:
+            artist (str): the track artist(s)
+
         Returns:
             bool: True if the artist appears to be an orchestra;
                 False otherwise
 
         """
-        artist = self.metadata['artist']
         return (',' in artist
                 and ('Orchestra' in artist
                      or 'cello' in artist

@@ -296,3 +296,31 @@ class Sorter:
 
         """
         return SUFFIX.sub(rf'{separator} \1', artist)
+
+    def does_file_count_match(self) -> bool:
+        """Check whether the file count after a sort matches that prior.
+
+        Sym-links do not count.
+
+        Returns:
+            bool: True if the number matches with self.real_files
+
+        """
+        count = self.count_files()
+        return count == self.real_files
+
+    def count_files(self) -> int:
+        """Count the number of sorted tracks (not sym-link) in the destination.
+
+        Returns:
+            int: the number of tracks after sorting
+
+        """
+        count = 0
+        for track in config.DEST.rglob('*.mp3'):
+            if track.is_symlink():
+                continue
+            else:
+                count += 1
+
+        return count

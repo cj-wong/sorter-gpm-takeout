@@ -6,10 +6,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ## [0.2.3] - 2021-01-03
 ### Changed
 - In [sorter.py]:
-    - `sanitize()` was not accurately reflected as having a potential `None` for its `label` argument; as a result and linted with `mypy`, `label` is now of type `Optional[str]`.
+    - The `label` argument for `sanitize()` did not accurately appear to be optional (i.e. can be `None`); as a result and linted with `mypy`, `label` is now of type `Optional[str]`.
         - **Because of this distinction of `label` being possibly empty, the argument order for `sanitize()` is now `category: str, label: Optional[str]`.**
     - The `try: except AttributeError:` block might not be necessary now, since `mypy` encourages a literal `None` check at the beginning.
-    - `self.metadata['artist']` is now manipulated as `artist` in `Sorter.sort()`, with another `None` check to ensure `mypy` doesn't complain about mismatching types.
+    - A new function-local variable `artist` is used in place of `self.metadata['artist']` in `Sorter.sort()`, with another `None` check to ensure `mypy` doesn't complain about mismatching types.
         - This allowed me to keep `Sorter.is_artist_orchestra()` and `Sorter.substitute_suffixes` relatively unchanged.
 
 ## [0.2.2] - 2021-01-02

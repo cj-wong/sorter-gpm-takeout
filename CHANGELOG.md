@@ -3,13 +3,25 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## [0.3.0] - 2021-03-11
+### Changed
+- In [sorter.py]:
+    - In `Sorter.sort()`:
+        - `album_dir` was renamed to a more accurate `parent_dir`. (The class method `Sorter.move_track()` similarly had its argument `album` renamed to `parent`.)
+        - The initial assignment of `self.metadata` is now enclosed in `try: except TypeError:`. I discovered that if all metadata is stripped from a track, its tag becomes `None` rather than an empty `dict` and thus not subscriptable. The file is moved to `dest/no_tags`. See Issue #3.
+        - Tracks that lack both artist and album tags are also moved to `dest/no_tags`. See Issue #3.
+
+### Fixed
+- Issue #3: Tracks that are missing either all metadata or just both artist and album tags will be moved into a separate 
+- Issue #4: Total track count is kept during sorting and checked at the end to ensure it matches the pre-sort count.
+
 ## [0.2.3] - 2021-01-03
 ### Changed
 - In [sorter.py]:
     - The `label` argument for `sanitize()` did not accurately appear to be optional (i.e. can be `None`); as a result and linted with `mypy`, `label` is now of type `Optional[str]`.
         - **Because of this distinction of `label` being possibly empty, the argument order for `sanitize()` is now `category: str, label: Optional[str]`.**
     - The `try: except AttributeError:` block might not be necessary now, since `mypy` encourages a literal `None` check at the beginning.
-    - A new function-local variable `artist` is used in place of `self.metadata['artist']` in `Sorter.sort()`, with another `None` check to ensure `mypy` doesn't complain about mismatching types.
+    - A new method-local variable `artist` is used in place of `self.metadata['artist']` in `Sorter.sort()`, with another `None` check to ensure `mypy` doesn't complain about mismatching types.
         - This allowed me to keep `Sorter.is_artist_orchestra()` and `Sorter.substitute_suffixes` relatively unchanged.
 
 ## [0.2.2] - 2021-01-02

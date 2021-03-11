@@ -77,6 +77,8 @@ class Sorter:
                     f'{track} has missing total disc number per album!')
                 disc_max = 1
 
+            self.real_files += 1
+
             try:
                 tags = self.track_data.tag
                 self.metadata = {
@@ -114,7 +116,12 @@ class Sorter:
                     self.move_track_no_metadata(track)
                     continue
 
-            album_track = self.move_track(track, parent_dir)
+            try:
+                album_track = self.move_track(track, parent_dir)
+            except FileExistsError:
+                # This track may be a duplicate, given the metadata.
+                continue
+
             self.extract_images(parent_dir)
 
             if not self.metadata['artist']:
@@ -185,6 +192,11 @@ class Sorter:
     def move_track(self, track: Path, parent: Path) -> Path:
         """Move a track from the Takeout folder into its parent directory.
 
+        Unfortunately, tracks with matching metadata (i.e. duplicate files)
+        may be double-tracked. self.real_files should decrement duplicates,
+        and an exception should be raised to prevent duplicates from being
+        re-processed.
+
         Args:
             track (Path): the file and path of the track
             parent (Path): the parent directory
@@ -192,16 +204,27 @@ class Sorter:
         Returns:
             Path: the renamed and moved track
 
+        Raises:
+            FileExistsError: the file already exists; this track may be
+                a duplicate
+
         """
         dest = (
             parent
             / config.FMT.format(**self.metadata)
             )
+        if dest.exists():
+            self.real_files -= 1
+            raise FileExistsError(f'{dest} already exists.')
+
         track.replace(dest)
         return dest
 
     def move_track_no_metadata(self, track: Path) -> None:
         """Move a track that has no metadata to Unsorted.
+
+        Unlike Sorter.move_track(), track.name is guaranteed to be unique,
+        by the properties of the filesystem.
 
         Args:
             track (Path): the file and path of the track

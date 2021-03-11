@@ -20,11 +20,11 @@ _FH.setLevel(logging.DEBUG)
 _CH = logging.StreamHandler()
 _CH.setLevel(logging.WARNING)
 
-FORMATTER = logging.Formatter(
+_FORMATTER = logging.Formatter(
     '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
     )
-_FH.setFormatter(FORMATTER)
-_CH.setFormatter(FORMATTER)
+_FH.setFormatter(_FORMATTER)
+_CH.setFormatter(_FORMATTER)
 
 LOGGER.addHandler(_FH)
 LOGGER.addHandler(_CH)
@@ -66,7 +66,7 @@ except _CONFIG_LOAD_ERRORS as e:
 try:
     with open('corrections.json', 'r') as f:
         CORR = json.load(f)
-    insert_missing_corrections()
 except _CONFIG_LOAD_ERRORS:
     LOGGER.info("corrections.json doesn't exist. Skipping.")
-    insert_missing_corrections()
+
+insert_missing_corrections()

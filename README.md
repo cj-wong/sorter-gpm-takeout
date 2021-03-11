@@ -4,11 +4,13 @@
 
 Google Play Music files can be exported via Google [Takeout]. However, the resulting file structure in the archives is flattened (see [below](#file-structure) for details) from the original (notably, no Albums listed) *and* many, if not most, of the files have truncated names.
 
-In order to bring back structure, this project will read through the files and rebuild the albums list and possibly rename the files as desired. To do so, the MP3s in `Takeout/Google Play Music/Tracks` will be read for clues to piece the files together.
+In order to bring back structure, this project will iterate through the tracks and rebuild the albums list, possibly renaming the files as desired. To do so, the files in `Takeout/Google Play Music/Tracks` will be read for clues to piece the files together.
 
-Furthermore, a [pattern](#format-structure) may be supplied in the configuration to rename files in a way that better convey a track's metadata.
+Furthermore, a [pattern](#format-structure) may be supplied in the configuration file to rename files in a way that better convey a track's metadata.
 
-**This project is not ever intended to modify metadata. It is strictly to organize the tracks into separate directories based on album and artist(s).**
+⚠ **This project is not ever intended to modify metadata. It is strictly to organize the tracks into separate directories based on album and artist(s) in the tracks' metadata.**
+
+⚠ Please ensure all your music is intact *before* deleting the original Takeout archive files!
 
 ## File structure
 
@@ -93,7 +95,9 @@ This code is designed around the following:
 
 ⚠ **These corrections do not take in account any other context, only their associated field. This means that when a value matches, it will be unconditionally substituted with its replacement.**
 
-If any of the fields are missing, they will be substituted with an empty dictionary within [config.py](sorter/config.py).
+For instance, if you put `"abc": "ABC"` under `"Artist"`, an artist (or group artist) whose name contains `abc` will now be changed to `ABC`, even if `abc` is in the middle of the name.
+
+*If any of the fields are missing, they will be substituted with an empty dictionary within [config.py](sorter/config.py), but will not be used in corrections.*
 
 ## Disclaimer
 

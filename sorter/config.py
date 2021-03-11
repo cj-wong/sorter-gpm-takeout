@@ -59,7 +59,7 @@ try:
     TRACKS = _TAKEOUT / 'Google Play Music' / 'Tracks'
     DEST = Path(CONFIG['dest_dir']).expanduser()
 except _CONFIG_LOAD_ERRORS as e:
-    LOGGER.error('config.json doesn\'t exist or is malformed.')
+    LOGGER.error("config.json doesn't exist or is malformed.")
     LOGGER.error(f'More information: {e}')
     raise e
 
@@ -68,5 +68,5 @@ try:
         CORR = json.load(f)
     insert_missing_corrections()
 except _CONFIG_LOAD_ERRORS:
-    LOGGER.info('corrections.json doesn\'t exist. Skipping.')
+    LOGGER.info("corrections.json doesn't exist. Skipping.")
     insert_missing_corrections()
